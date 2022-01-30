@@ -9,14 +9,14 @@ Ref: https://towardsdatascience.com/music-in-python-2f054deb41f4
 """
 
 import numpy as np
-from scipy.io import wavfile
+# from scipy.io import wavfile
 import sys, random, os, math
 # from Bio import SeqIO #biopython
 from itertools import permutations
 import itertools
 
 
-DATE = "25 January 2022"
+DATE = "30 January 2022"
 VERSION = "i"
 AUTHOR = "Oliver Bonham-Carter"
 AUTHORMAIL = "obonhamcarter@allegheny.edu"
@@ -201,6 +201,12 @@ def get_adsr_weights(frequency, duration, length, decay, sustain_level, sample_r
 	weights : ndarray
 
 	'''
+	try:
+		from scipy.io import wavfile
+	except ModuleNotFoundError:
+		print(printWithColour(BIRed,f"\t [+] The sciPy library is not installed.\n\t Please install, or use option -E \n\t to see other options to use {THISPROG}."))
+		exit()
+
 	assert abs(sum(length)-1) < 1e-8
 	assert len(length) ==len(decay) == 4
 
@@ -408,24 +414,40 @@ def helper():
 	print(printWithColour(BIGreen,f"\t[+]"),printWithColour(BICyan,f"[-H]"),printWithColour(BIYellow,"This page, right?"))
 	print(printWithColour(BIGreen,f"\t[+]"),printWithColour(BICyan,"[-S]"),printWithColour(BIYellow,"Create a music scale"))
 	print(printWithColour(BIGreen,f"\t[+]"),printWithColour(BICyan,"[-T]"),printWithColour(BIYellow,"Create song: Twinkle-Twinkle Little Star"))
-	print(printWithColour(BIGreen,f"\t[+]"),printWithColour(BICyan,"[-E]"),printWithColour(BIYellow,"Instructions for running this wonderous tool\n\t\t sans Docker container."))
+	print(printWithColour(BIGreen,f"\t[+]"),printWithColour(BICyan,"[-E]"),printWithColour(BIYellow,"Instructions for running this wonderous tool.\n\t\t"))
 	print(printWithColour(BIGreen,f"\n\t[+] \U0001f600 USAGE: ./{THISPROG}  dnaFile.fasta"))
 
 #end of helper()
 
 def helper_extended():
 	""" Function to print up extra information for the user."""
+	print(printWithColour(BIBlue,"\n\t # --------------------------"))
 
-	# # Some versions of Python may have virtualizing software already installed
-	# python -m venv myvenv
 
-	# msg_str =  """
+	print(printWithColour(BIGreen,"""\n\t You can run the program in \n\t preconfigured Docker container.
+
+	 To build your container, be outside of /scr and
+	 /dockerRunScripts when you run the following
+	 scripts. """))
+
+	print(printWithColour(BIGreen,"\n\t # Building the container"))
+	print(printWithColour(BICyan,"\t Linux:"), printWithColour(BIYellow,"sh dockerRunScripts/build_linux.sh"))
+	print(printWithColour(BICyan,"\t MacOS:"), printWithColour(BIYellow,"sh dockerRunScripts/build_macOS.sh"))
+	print(printWithColour(BICyan,"\t Windows:"), printWithColour(BIYellow,"dockerRunScripts\\build_win.bat"))
+
+	print(printWithColour(BIGreen,"\n\t # Running the container"))
+	print(printWithColour(BICyan,"\t Linux:"), printWithColour(BIYellow,"sh dockerRunScripts/run_linux.sh"))
+	print(printWithColour(BICyan,"\t MacOS:"), printWithColour(BIYellow,"sh dockerRunScripts/run_macOS.sh"))
+	print(printWithColour(BICyan,"\t Windows:"), printWithColour(BIYellow,"dockerRunScripts\\run_win.bat"))
+
+	print(printWithColour(BIGreen,f"\n\t[+] \U0001f600 USAGE: ./{THISPROG}  ./data/dnaFile.fasta"))
+	print(printWithColour(BIBlue,"\n\t # --------------------------"))
+
 	print(printWithColour(BIGreen,"""
 	 To run the program using a virtual
 	 environment (and not in a Docker
 	 container), then the following
-	 commands may be used.
-	 --------------------------"""))
+	 commands may be used."""))
 
 	print(printWithColour(BICyan,"\n\t # Install pip installer."))
 	print(printWithColour(BICyan,"\t You might need a password here."))
@@ -448,8 +470,8 @@ def helper_extended():
 	# print(printWithColour(BIYellow,"\t pip install streamlit"))
 	print(printWithColour(BIYellow,"\t pip install scipy"))
 
-	print(printWithColour(BICyan,"\n\t # --------------------------"))
-	print(printWithColour(BICyan,"\t #Note: You might want to clean up theses\n\t files by removing the myenv/ directory."))
+	print(printWithColour(BIBlue,"\n\t # --------------------------"))
+	print(printWithColour(BIGreen,"\n\t #Note: You might want to clean up theses\n\t files by removing the myenv/ directory."))
 
 	# Check what has been installed.
 	# python3 -m pip freeze > requirements.txt
@@ -463,8 +485,11 @@ def openDnaSeq(fastaFile_str):
 	""" open a fasta file, return the dna sequences"""
 
 	# print(printWithColour(BIGreen, "openDnaSeq()"))
-
-	from Bio import SeqIO #biopython
+	try:
+		from Bio import SeqIO #biopython
+	except ModuleNotFoundError:
+		print(printWithColour(BIRed,f"\t [+] The BioPython library is not installed.\n\t Please install, or use option -E \n\t to see other options to use {THISPROG}."))
+		exit()
 
 	print(printWithColour(BIYellow,f"\t [+] Opening FASTA file {fastaFile_str}\n"))
 	seq_dic = {}
@@ -615,6 +640,13 @@ def makeNotesFromSeq():
 	dnaNotes_dic = {} # create a dictionary of base pairs to notes
 
 def makeMusicDemo(names_list, left_hand_notes, left_hand_duration, right_hand_notes = [], right_hand_duration = []):
+
+	try:
+		from scipy.io import wavfile
+	except ModuleNotFoundError:
+		print(printWithColour(BIRed,f"\t [+] The sciPy library is not installed.\n\t Please install, or use option -E \n\t to see other options to use {THISPROG}."))
+		exit()
+
 	factor = [0.68, 0.26, 0.03, 0.  , 0.03]
 	length = [0.01, 0.6, 0.29, 0.1]
 	decay = [0.05,0.02,0.005,0.1]
@@ -642,7 +674,11 @@ def makeMusicDemo(names_list, left_hand_notes, left_hand_duration, right_hand_no
 
 def makeMusicFromChars(name_str, notes_list, duration_list):
 	""" Function to convert chars to musical wav file."""
-
+	try:
+		from scipy.io import wavfile
+	except ModuleNotFoundError:
+		print(printWithColour(BIRed,f"\t [+] The sciPy library is not installed.\n\t Please install, or use option -E \n\t to see other options to use {THISPROG}."))
+		exit()
 	# print("makeMusicFromChars()")
 
 	factor = [0.68, 0.26, 0.03, 0.  , 0.03]
