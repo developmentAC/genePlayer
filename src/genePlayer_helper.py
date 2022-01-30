@@ -471,7 +471,7 @@ def helper_extended():
 	print(printWithColour(BIYellow,"\t pip install scipy"))
 
 	print(printWithColour(BIBlue,"\n\t # --------------------------"))
-	print(printWithColour(BIGreen,"\n\t #Note: You might want to clean up theses\n\t files by removing the myenv/ directory."))
+	print(printWithColour(BIGreen,"\n\t # Note: You might want to clean up theses\n\t files by removing the myenv/ directory."))
 
 	# Check what has been installed.
 	# python3 -m pip freeze > requirements.txt
