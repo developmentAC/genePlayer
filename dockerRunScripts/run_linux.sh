@@ -12,5 +12,9 @@ printf "\n [+] ${BIGreen} Hello ${USER}! Setting up your working container.${NC}
 # Run container:
 sudo docker run --rm -it -p 8501:8501 -v $PWD:/root geneplayer
 
+# return file ownership to user
+sudo chown ${USER} 0_out/
+sudo chown ${USER} 0_out/*
+
 
 printf "\n  [+] ${BIGreen} The working container is now closed. ${NC}\n"
